@@ -46,6 +46,10 @@
 #include "serverlogging.h"
 #include "serverlist.h"
 #include "recorder/jamcontroller.h"
+#include "metrics.h"
+
+#include <prometheus/exposer.h>
+#include <prometheus/registry.h>
 
 /* Definitions ****************************************************************/
 // no valid channel number
@@ -182,7 +186,8 @@ public:
               const bool         bNUseDoubleSystemFrameSize,
               const bool         bNUseMultithreading,
               const bool         bDisableRecording,
-              const ELicenceType eNLicenceType );
+              const ELicenceType eNLicenceType,
+              CMetrics*    metrics);
 
     virtual ~CServer();
 
@@ -400,6 +405,8 @@ protected:
 
     CSignalHandler*            pSignalHandler;
 
+    CMetrics*    metrics;
+    
 signals:
     void Started();
     void Stopped();

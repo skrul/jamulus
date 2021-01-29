@@ -32,6 +32,7 @@
 # include "clientdlg.h"
 # include "serverdlg.h"
 #endif
+#include "metrics.h"
 #include "settings.h"
 #include "testbench.h"
 #include "util.h"
@@ -42,6 +43,8 @@
 # include "mac/activity.h"
 #endif
 
+#include <prometheus/exposer.h>
+#include <prometheus/registry.h>
 
 // Implementation **************************************************************
 
@@ -631,6 +634,11 @@ int main ( int argc, char** argv )
 // TEST -> activate the following line to activate the test bench,
 //CTestbench Testbench ( "127.0.0.1", DEFAULT_PORT_NUMBER );
 
+    prometheus::Exposer exposer{"127.0.0.1:8888"};
+    auto registry = std::make_shared<prometheus::Registry>();
+    exposer.RegisterCollectable(registry);
+
+    CMetrics metrics(*registry);
 
     try
     {
@@ -699,7 +707,8 @@ int main ( int argc, char** argv )
                              bUseDoubleSystemFrameSize,
                              bUseMultithreading,
                              bDisableRecording,
-                             eLicenceType );
+                             eLicenceType,
+                             &metrics);
 
 #ifndef HEADLESS
             if ( bUseGUI )

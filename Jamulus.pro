@@ -45,6 +45,13 @@ TRANSLATIONS = src/res/translation/translation_de_DE.ts \
 
 INCLUDEPATH += src
 
+#INCLUDEPATH += /Users/steve_krulewitz/dev/prometheus-cpp/_build/deploy/usr/local/include
+#LIBS += -L/Users/steve_krulewitz/dev/prometheus-cpp/_build/deploy/usr/local/lib \
+#-lprometheus-cpp-pull -lprometheus-cpp-core -lz
+
+INCLUDEPATH += /usr/local/Cellar/prometheus-cpp/0.11.0/include
+LIBS += -L/usr/local/Cellar/prometheus-cpp/0.11.0/lib -lprometheus-cpp-pull -lprometheus-cpp-core -lz
+
 INCLUDEPATH_OPUS = libs/opus/include \
     libs/opus/celt \
     libs/opus/silk \
@@ -396,6 +403,7 @@ HEADERS += src/buffer.h \
     src/client.h \
     src/global.h \
     src/multicolorled.h \
+    src/metrics.h \
     src/protocol.h \
     src/recorder/jamcontroller.h \
     src/server.h \
@@ -495,6 +503,7 @@ SOURCES += src/buffer.cpp \
     src/channel.cpp \
     src/client.cpp \
     src/main.cpp \
+    src/metrics.cpp \
     src/protocol.cpp \
     src/recorder/jamcontroller.cpp \
     src/server.cpp \

@@ -232,7 +232,8 @@ CServer::CServer ( const int          iNewMaxNumChan,
                    const bool         bNUseDoubleSystemFrameSize,
                    const bool         bNUseMultithreading,
                    const bool         bDisableRecording,
-                   const ELicenceType eNLicenceType ) :
+                   const ELicenceType eNLicenceType,
+                   CMetrics*    metrics) :
     bUseDoubleSystemFrameSize   ( bNUseDoubleSystemFrameSize ),
     bUseMultithreading          ( bNUseMultithreading ),
     iMaxNumChannels             ( iNewMaxNumChan ),
@@ -252,7 +253,8 @@ CServer::CServer ( const int          iNewMaxNumChan,
     bAutoRunMinimized           ( false ),
     eLicenceType                ( eNLicenceType ),
     bDisconnectAllClientsOnQuit ( bNDisconnectAllClientsOnQuit ),
-    pSignalHandler              ( CSignalHandler::getSingletonP() )
+    pSignalHandler              ( CSignalHandler::getSingletonP() ),
+    metrics                     ( metrics )
 {
     int iOpusError;
     int i;
@@ -656,7 +658,9 @@ void CServer::OnNewConnection ( int          iChID,
     DoubleFrameSizeConvBufOut[iChID].Reset();
 
     // logging of new connected channel
-    Logging.AddNewConnection ( RecHostAddr.InetAddr, GetNumberOfConnectedClients() );
+    int numberOfConnectedClients = GetNumberOfConnectedClients();
+    Logging.AddNewConnection ( RecHostAddr.InetAddr, numberOfConnectedClients );
+    metrics->UpdateConnectionCount(numberOfConnectedClients);
 }
 
 void CServer::OnServerFull ( CHostAddress RecHostAddr )
@@ -685,6 +689,9 @@ void CServer::OnCLDisconnection ( CHostAddress InetAddr )
     {
         vecChannels[iCurChanID].Disconnect();
     }
+
+    int numberOfConnectedClients = GetNumberOfConnectedClients();
+    metrics->UpdateConnectionCount(numberOfConnectedClients);
 }
 
 void CServer::OnAboutToQuit()
@@ -784,6 +791,7 @@ void CServer::OnTimer()
 /*
 static CTimingMeas JitterMeas ( 1000, "test2.dat" ); JitterMeas.Measure(); // TEST do a timer jitter measurement
 */
+    metrics->MainLoopStart();
     // Get data from all connected clients -------------------------------------
     // some inits
     int iNumClients           = 0; // init connected client counter
@@ -935,6 +943,8 @@ static CTimingMeas JitterMeas ( 1000, "test2.dat" ); JitterMeas.Measure(); // TE
         // does not consume any significant CPU when no client is connected.
         Stop();
     }
+    metrics->IncrementMainLoopCount();
+    metrics->MainLoopEnd();
 }
 
 void CServer::DecodeReceiveDataBlocks ( const int iStartChanCnt,
