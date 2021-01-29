@@ -1,6 +1,7 @@
 #pragma once
 
 #include <QObject>
+#include <QElapsedTimer>
 
 #include <prometheus/counter.h>
 #include <prometheus/gauge.h>
