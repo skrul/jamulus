@@ -2,8 +2,6 @@
 
 #include <QObject>
 
-#include "client.h"
-
 #include <prometheus/counter.h>
 #include <prometheus/gauge.h>
 #include <prometheus/exposer.h>
